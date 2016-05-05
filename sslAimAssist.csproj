@@ -40,6 +40,10 @@
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\SteamApps\common\ShellShock Live\ShellShockLive_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="Vectrosity, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\SteamApps\common\ShellShock Live\ShellShockLive_Data\Managed\Vectrosity.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />

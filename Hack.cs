@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using Vectrosity;
 
 namespace sslAimAssist
 {
@@ -19,6 +20,9 @@ namespace sslAimAssist
 
         private double g = 9.812;
         private float powerSalt = 10.75f;
+        private int increment = 10;
+        private int decrement = -10;
+        private int count = 0;
 
         void Start()
         {
@@ -35,10 +39,21 @@ namespace sslAimAssist
             {
                 powerSalt += 0.25f;
             }
+            if (Input.GetKeyDown(KeyCode.Keypad2))
+            {
+                increment += 1;
+                decrement -= 1;
+            }
+            if (Input.GetKeyDown(KeyCode.Keypad3))
+            {
+                increment -= 1;
+                decrement += 1;
+            }
+
 
             if (Game.round.me.mc != null)
             {
-                OverlayString = Aimer.instance.power + "   " + Aimer.instance.angle + "  " + powerSalt;
+                OverlayString = Aimer.instance.power + "   " + Aimer.instance.angle + "  " + powerSalt + "     increment:: "+ increment;
                 OverlayString += Environment.NewLine + string.Format("ME:: X={0:0.0###}   Y={1}", Game.round.me.x, Game.round.me.y);
 
 
@@ -65,27 +80,57 @@ namespace sslAimAssist
 
         private void projectileMotion(float p1, int p2)
         {
-            float angle = (float)getAngle(Aimer.instance.angle);
-            int count = 0;
-            if (Aimer.instance.angle <= 180)
+            int dAngle = Aimer.instance.angle;
+            int power = Aimer.instance.power;
+            float angle = (float)getAngle(dAngle);
+            int Xpos = (int)(Game.round.me.x);
+
+            count++;
+            if (count > 5)
             {
-                for (int i = 1; i <= 1000; i += 10)
+                count = 0;
+                Tracers.Clear();
+            }
+
+            if (dAngle <= 180)
+            {
+                Proj p = new Proj();
+                TracerLine tracer = Tracers.CreateLine(p, Color.red);
+
+                for (int i = 1; i <= 1000-Xpos; i += increment)
                 {
-                    float t = i / ((Aimer.instance.power + powerSalt) * Mathf.Cos(angle));
-                    float Y = (float)(((Aimer.instance.power + powerSalt) * Mathf.Sin(angle)) * t - (0.5 * g * t * t));
-                    Spawn.GO(Scene_Game.instance.tracerDotPrefab, null, Map.toWorldX((float)i + Game.round.me.x), Map.toWorldY(Game.round.me.y + Y), 0f, null).GetComponent<TracerDot>().Init(count);
-                    count++;
+                    float t = i / ((power + powerSalt) * Mathf.Cos(angle));
+                    float Y = (float)(((power + powerSalt) * Mathf.Sin(angle)) * t - (0.5 * g * t * t));
+                    
+                    Vector3 point = new Vector3(Map.toWorldX((float)i+Xpos), Map.toWorldY(Game.round.me.y + Y));
+                    tracer.line.points3.Add(point);
+
+                    if (Game.round.me.y + Y < 0)
+                    {
+                        break;//round has gone off bottom of screen
+                    }    
                 }
+                tracer.line.Draw3D();
+                
             }
             else
             {
-                for (int i = 1; i > -1000; i -= 10)
+                Proj p = new Proj();
+                TracerLine tracer = Tracers.CreateLine(p, Color.red);
+                for (int i = 1; i < Xpos ; i += increment)
                 {
-                    float t = i / ((Aimer.instance.power + powerSalt) * Mathf.Cos(angle));
-                    float Y = (float)(((Aimer.instance.power + powerSalt) * Mathf.Sin(angle)) * t - (0.5 * g * t * t));
-                    Spawn.GO(Scene_Game.instance.tracerDotPrefab, null, Map.toWorldX((float)i + Game.round.me.x), Map.toWorldY(Game.round.me.y + Y), 0f, null).GetComponent<TracerDot>().Init(count);
-                    count++;
+                    float t = i / ((power + powerSalt) * Mathf.Cos(angle));
+                    float Y = (float)(((power + powerSalt) * Mathf.Sin(angle)) * t - (0.5 * g * t * t));
+
+                    Vector3 point = new Vector3(Map.toWorldX((float)Xpos - i), Map.toWorldY(Game.round.me.y + Y));
+                    tracer.line.points3.Add(point);
+
+                    if (Game.round.me.y + Y < 0)
+                    {
+                        break;//round has gone off bottom of screen
+                    }                    
                 }
+                tracer.line.Draw3D();
             }
         }
 
@@ -102,11 +147,11 @@ namespace sslAimAssist
             }
             else if (angle > 180 && angle <= 270)
             {
-                ret = (angle - 270) * -1;
+                ret = (angle - 270) * 1;
             }
             else if (angle > 270)
             {
-                ret = (angle - 270) * -1;
+                ret = (angle - 270) * 1;
             }
             ret = (float)((ret * Mathf.PI) / 180.0);
             return ret;
