@@ -19,10 +19,10 @@ namespace sslAimAssist
         private float lastTime = Time.time;
 
         private double g = 9.812;
-        private float powerSalt = 10.75f;
         private int increment = 10;
-        private int decrement = -10;
         private int count = 0;
+
+        private double[] powerSalt={5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 6.0, 6.0, 6.0, 6.0, 6.0, 6.25, 6.25, 6.25, 6.25, 6.25, 6.5, 6.5, 6.5, 6.5, 6.5, 7.0, 7.0, 7.0, 7.0, 7.0, 7.75, 7.75, 7.75, 7.75, 7.75, 8.25, 8.25, 8.25, 8.25, 8.25, 8.75, 8.75, 8.75, 8.75, 8.75, 9.5, 9.5, 9.5, 9.5, 9.5, 9.75, 9.75, 9.75, 9.75, 9.75, 10.5, 10.5, 10.5, 10.5, 10.5, 11.0, 11.0, 11.0, 11.0, 11.0, 11.5, 11.5, 11.5, 11.5, 11.5, 12.25, 12.25, 12.25, 12.25, 12.25, 12.75, 12.75, 12.75, 13.25, 13.25, 13.25 };
 
         void Start()
         {
@@ -31,29 +31,24 @@ namespace sslAimAssist
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Keypad0))
-            {
-                powerSalt -= 0.25f;
-            }
-            if (Input.GetKeyDown(KeyCode.Keypad1))
-            {
-                powerSalt += 0.25f;
-            }
+            
             if (Input.GetKeyDown(KeyCode.Keypad2))
             {
                 increment += 1;
-                decrement -= 1;
             }
             if (Input.GetKeyDown(KeyCode.Keypad3))
             {
                 increment -= 1;
-                decrement += 1;
+                if (increment < 1)
+                {
+                    increment = 1;                    
+                }
             }
 
 
             if (Game.round.me.mc != null)
             {
-                OverlayString = Aimer.instance.power + "   " + Aimer.instance.angle + "  " + powerSalt + "     increment:: "+ increment;
+                OverlayString = Aimer.instance.power + "   " + Aimer.instance.angle + "  " + powerSalt[Aimer.instance.power] + "     increment:: "+ increment;
                 OverlayString += Environment.NewLine + string.Format("ME:: X={0:0.0###}   Y={1}", Game.round.me.x, Game.round.me.y);
 
 
@@ -99,8 +94,8 @@ namespace sslAimAssist
 
                 for (int i = 1; i <= 1000-Xpos; i += increment)
                 {
-                    float t = i / ((power + powerSalt) * Mathf.Cos(angle));
-                    float Y = (float)(((power + powerSalt) * Mathf.Sin(angle)) * t - (0.5 * g * t * t));
+                    float t = i / (float)((power + powerSalt[power]) * Mathf.Cos(angle));
+                    float Y = (float)(((power + powerSalt[power]) * Mathf.Sin(angle)) * t - (0.5 * g * t * t));
                     
                     Vector3 point = new Vector3(Map.toWorldX((float)i+Xpos), Map.toWorldY(Game.round.me.y + Y));
                     tracer.line.points3.Add(point);
@@ -119,8 +114,8 @@ namespace sslAimAssist
                 TracerLine tracer = Tracers.CreateLine(p, Color.red);
                 for (int i = 1; i < Xpos ; i += increment)
                 {
-                    float t = i / ((power + powerSalt) * Mathf.Cos(angle));
-                    float Y = (float)(((power + powerSalt) * Mathf.Sin(angle)) * t - (0.5 * g * t * t));
+                    float t = i / (float)((power + powerSalt[power]) * Mathf.Cos(angle));
+                    float Y = (float)(((power + powerSalt[power]) * Mathf.Sin(angle)) * t - (0.5 * g * t * t));
 
                     Vector3 point = new Vector3(Map.toWorldX((float)Xpos - i), Map.toWorldY(Game.round.me.y + Y));
                     tracer.line.points3.Add(point);
